@@ -12,8 +12,8 @@ export default function Home() {
 
   useEffect(() => {
     if (session) {
-      fetchDriveFiles();
-      fetchEmails();
+      // fetchDriveFiles();
+      // fetchEmails();
     }
   }, [session]);
 
@@ -65,7 +65,11 @@ export default function Home() {
     <div>
       <h1>Google API Integration</h1>
       {!session ? (
-        <button onClick={() => signIn('google')}>Sign in with Google</button>
+        <button onClick={() => 
+          // signIn('google')
+          signIn()
+          // signIn('github', { scope: 'repo user user:email' })
+        }>Sign in with Google</button>
       ) : (
         <>
           <p>Welcome, {session.user?.name}</p>
@@ -106,3 +110,4 @@ export default function Home() {
     </div>
   );
 }
+
