@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { authOptions } from "../../../auth/[...nextauth]/route";
 import axios from 'axios';
 
 export async function GET(request: Request) {
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
         'Accept': 'application/json',
       },
     });
-    console.log(response.data)
+    console.log(response.data);
     // {
     //     kind: 'drive#file',
     //     id: '1uHBW9Bd4O9W19iCq1Vc9riu5Gf4RuPmoCwnzU5cXYzo',

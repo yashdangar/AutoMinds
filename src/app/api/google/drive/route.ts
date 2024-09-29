@@ -1,8 +1,8 @@
 import { google } from 'googleapis';
 import { getServerSession } from 'next-auth';
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 
-export async function POST(req: Request) {
+export async function GET(req: Request) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
@@ -11,14 +11,12 @@ export async function POST(req: Request) {
   const auth = new google.auth.OAuth2();
   auth.setCredentials({ access_token: session.accessToken });
 
-  const gmail = google.gmail({ version: 'v1', auth });
+  const drive = google.drive({ version: 'v3', auth });
 
-  const { raw } = await req.json();
-
-  const result = await gmail.users.messages.send({
-    userId: 'me',
-    requestBody: { raw },
+  const result = await drive.files.list({
+    pageSize: 10,
+    fields: 'files(id, name)',
   });
 
-  return new Response(JSON.stringify(result.data), { status: 200 });
+  return new Response(JSON.stringify(result.data.files), { status: 200 });
 }
