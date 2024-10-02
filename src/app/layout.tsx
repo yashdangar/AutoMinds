@@ -1,6 +1,7 @@
-"use client"
-import './globals.css';
-import { SessionProvider } from 'next-auth/react';
+"use client";
+import "./globals.css";
+import { ThemeProvider } from "@/components/providers/theme-providers";
+import { SessionProvider } from "next-auth/react";
 
 export default function RootLayout({
   children,
@@ -9,8 +10,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <SessionProvider>{children}</SessionProvider>
+      <body style={{ overflowX: "hidden" }}>
+        <SessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );

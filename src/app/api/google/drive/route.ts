@@ -7,7 +7,7 @@ export async function GET(req: Request) {
   if (!session) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
   }
-
+  
   const auth = new google.auth.OAuth2();
   auth.setCredentials({ access_token: session.accessToken });
 

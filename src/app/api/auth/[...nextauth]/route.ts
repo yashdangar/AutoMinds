@@ -1,7 +1,6 @@
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import GithubProvider from "next-auth/providers/github";
-import DiscordProvider from 'next-auth/providers/discord';
 
 export const authOptions = {
   providers: [
@@ -13,9 +12,7 @@ export const authOptions = {
           scope : "openid email profile https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send",
       },
       },
-    })
-    
-    ,
+    }),
     GithubProvider({
       clientId: process.env.GITHUB_CLIENT_ID as string,
       clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
@@ -27,8 +24,11 @@ export const authOptions = {
     })
   ],
   secret: process.env.NEXTAUTH_SECRET,
+  pages: {
+    signIn: '/auth/signin'
+  },
   callbacks: {
-    // next-auth uses cookeis and store the token in the cookie , not in localstorage or sessionstorage
+    // next-auth uses cookies and store the token in the cookie , not in localstorage or sessionstorage
     async jwt({ token, account }:any) {
       // console.log("JWT CALLBACK", token, account);
       if (account) {
@@ -46,6 +46,9 @@ export const authOptions = {
       session.githubAccessToken = token.githubAccessToken;
       return session;
     },
+    async redirect({ url, baseUrl }:{url:string, baseUrl:string}) {
+      return baseUrl + '/dashboard';
+    }
   },
 };
 

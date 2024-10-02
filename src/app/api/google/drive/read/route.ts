@@ -33,6 +33,7 @@ export async function GET(request: Request) {
     //   }
     return NextResponse.json(response.data);
   } catch (error) {
+    console.log(error);
     return NextResponse.json({ error: 'Failed to read file' }, { status: 500 });
   }
 }
