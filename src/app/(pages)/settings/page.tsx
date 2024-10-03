@@ -1,11 +1,11 @@
-"us client"
+"use client"
 import { signOut } from 'next-auth/react'
 import React from 'react'
 
 function Settings() {
   return (
     <div>
-      <button onClick={()=>{signOut()}}>Signout</button>
+      <button onClick={() => signOut()}>Signout</button>
     </div>
   )
 }
