@@ -5,8 +5,12 @@ import { cn } from "@/lib/utils";
 import { SparklesCore } from "./sparkles";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 export function LampComponent() {
+  
+  const { data : session , status } = useSession();
+
     return (
       <LampContainer className="w-[100vw]">
         <motion.h1
@@ -31,7 +35,7 @@ export function LampComponent() {
           ease: "easeInOut",
         }}>
           <Link
-            href="/dashboard"
+            href= {status === "authenticated" ? '/dashboard' : '/auth/signin'}
             className="px-8 py-[10px] mb-8 md:mb-0 text-2xl w-full sm:w-fit border-t-2 rounded-full border-[#4D4D4D] bg-[#1F1F1F] hover:bg-white group transition-all flex items-center justify-center gap-4 hover:shadow-xl hover:shadow-neutral-500 duration-500"
           >
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-neutral-500 to-neutral-600  md:text-center font-sans group-hover:bg-gradient-to-r group-hover:from-black group-hover:to-black">

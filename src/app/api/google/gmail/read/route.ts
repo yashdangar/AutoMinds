@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from "../../../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 import axios from 'axios';
 
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
 
-  if (!session || !session.accessToken) {
+  if (!session || !session.accessToken) { 
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

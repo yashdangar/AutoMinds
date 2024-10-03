@@ -10,7 +10,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body style={{ overflowX: "hidden" }}>
+      <body className="overflow-x-hidden">
         <SessionProvider>
           <ThemeProvider
             attribute="class"

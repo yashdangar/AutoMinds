@@ -13,10 +13,80 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
   id        String @id @default(uuid())
   name      String
   GoogleId  String
+
+  // This will point to the AccessToken table , where we store access tokens for different services / scopes 
+  AccessToken AccessToken?
+
+  // This will point to the Workflow table , where we store the workflows created by the user (one to many relation)
+  Workflows Workflow[]
+}
+
+model AccessToken {
+  id       String @id @default(uuid())
+  token     String
+  userId    String @unique
+  user      User   @relation(fields: [userId], references: [id])
+
+  GoogleAcessToken String @unique
+  GoogleDriveAccessToken String @unique
+  GoogleMailAccessToken String @unique
+  GithubAccessToken String @unique
+  NotionAccessToken String @unique
+  SlackAccessToken String @unique
+  DiscordAccessToken String @unique
+}
+
+model Workflow {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  nodes       Node[]   @relation("WorkflowNodes") // One-to-many relationship with Node
+  edges       Edge[]   @relation("WorkflowEdges") // One-to-many relationship with Edge
+
+  @@unique([name, userId])
+}
+
+// Tree data structure for the workflow
+model Node {
+  id            String   @id @default(uuid())
+  name          String
+  description   String
+  type          NodeType
+  workflowId    String
+  workflow      Workflow @relation("WorkflowNodes", fields: [workflowId], references: [id]) // Many-to-one relationship with Workflow
+
+  // this will store position for react flow
+  positionX     Float
+  positionY     Float
+
+  @@unique([name, workflowId]) // this means that the name of the node should be unique in the workflow
+}
+
+model Edge  {
+  id         String @id @default(uuid())
+  sourceId   String // this will be the id of the source node
+  targetId   String // this will be the id of the target node
+
+  workflowId String // this will be the id of the workflow
+  workflow   Workflow @relation("WorkflowEdges", fields: [workflowId], references: [id]) // Many-to-one relationship with Workflow
+}
+
+//  WIP : have to add models for GOOGLEDRIVENODE , GMAILNODE , GITHUBNODE , NOTIONNODE , SLACKNODE , DISCORDNODE
+
+enum NodeType {
+  GoogleDrive
+  GoogleMail 
+  Github
+  Discord
+  Notion 
+  Slack 
 }
