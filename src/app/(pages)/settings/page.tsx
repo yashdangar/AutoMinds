@@ -1,8 +1,11 @@
+import { signOut } from 'next-auth/react'
 import React from 'react'
 
 function Settings() {
   return (
-    <div>Settings</div>
+    <div>
+      <button onClick={()=>{signOut()}}>Signout</button>
+    </div>
   )
 }
 
