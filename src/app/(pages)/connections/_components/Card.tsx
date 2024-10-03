@@ -30,7 +30,7 @@ const ConnectionCard = ({
 
   const handleClick = (type: ConnectionTypes) => {
     if(type === "G-Mail") {
-      signIn("google",{scopes: "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send"});
+      signIn("google");
     }
     else if(type === "Slack") {
       signIn("slack",{scopes:"channels:read channels:history channels:manage channels:join chat:write chat:write.customize chat:write.public chat:write.bot"});
@@ -42,10 +42,10 @@ const ConnectionCard = ({
       signIn("discord",{scopes:"identify guilds.join"});
     }
     else if(type === "Google Drive") {
-      signIn("google",{scopes: "https://www.googleapis.com/auth/drive"});
+      signIn("google");
     }
     else if(type === "Github") {
-      signIn("github",{scopes: "repo user gist notifications read:org"});
+      signIn("github");
     }
   };
   
