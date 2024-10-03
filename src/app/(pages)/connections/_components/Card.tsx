@@ -27,10 +27,10 @@ const ConnectionCard = ({
   connected,
 }: Props) => {
 
+
   const handleClick = (type: ConnectionTypes) => {
     if(type === "G-Mail") {
-      signIn("google",{scopes: "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send",callbackUrl: 
-        `${process.env.NEXT_PUBLIC_URL}/connections`});
+      signIn("google",{scopes: "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send"});
     }
     else if(type === "Slack") {
       signIn("slack",{scopes:"channels:read channels:history channels:manage channels:join chat:write chat:write.customize chat:write.public chat:write.bot"});
@@ -48,6 +48,7 @@ const ConnectionCard = ({
       signIn("github",{scopes: "repo user gist notifications read:org"});
     }
   };
+  
 
   return (
     <Card className="flex w-[45vw] items-center justify-between ">

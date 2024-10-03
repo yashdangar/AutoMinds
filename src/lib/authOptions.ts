@@ -1,6 +1,7 @@
-import { AuthOptions, NextAuthOptions } from "next-auth";
+import { AuthOptions } from "next-auth";
 import GoogleProvider from 'next-auth/providers/google';
 import GithubProvider from 'next-auth/providers/github';
+import prisma from "./db";
 
 export const authOptions : AuthOptions = {
   providers: [

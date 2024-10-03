@@ -1,3 +1,4 @@
+/* eslint-disable no-var */
 // lib/prisma.ts
 import { PrismaClient } from '@prisma/client';
 import { withAccelerate } from '@prisma/extension-accelerate';

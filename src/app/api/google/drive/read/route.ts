@@ -6,7 +6,7 @@ import axios from 'axios';
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
   
-  if (!session || !session.accessToken) {
+  if (!session || !session.googleAccessToken) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
