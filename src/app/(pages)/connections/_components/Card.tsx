@@ -29,20 +29,17 @@ const ConnectionCard = ({
 
 
   const handleClick = (type: ConnectionTypes) => {
-    if(type === "G-Mail") {
+    if(type === "Google") {
       signIn("google");
     }
     else if(type === "Slack") {
-      signIn("slack",{scopes:"channels:read channels:history channels:manage channels:join chat:write chat:write.customize chat:write.public chat:write.bot"});
+      signIn("slack");
     }
     else if(type === "Notion") {
       signIn("notion")
     }
     else if(type === "Discord") {
-      signIn("discord",{scopes:"identify guilds.join"});
-    }
-    else if(type === "Google Drive") {
-      signIn("google");
+      signIn("discord");
     }
     else if(type === "Github") {
       signIn("github");

@@ -35,8 +35,6 @@ model AccessToken {
   user      User   @relation(fields: [userId], references: [id])
 
   GoogleAcessToken String @unique
-  GoogleDriveAccessToken String @unique
-  GoogleMailAccessToken String @unique
   GithubAccessToken String @unique
   NotionAccessToken String @unique
   SlackAccessToken String @unique
@@ -83,8 +81,7 @@ model Edge  {
 //  WIP : have to add models for GOOGLEDRIVENODE , GMAILNODE , GITHUBNODE , NOTIONNODE , SLACKNODE , DISCORDNODE
 
 enum NodeType {
-  GoogleDrive
-  GoogleMail 
+  Google
   Github
   Discord
   Notion 

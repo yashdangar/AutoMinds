@@ -5,8 +5,6 @@ declare module "next-auth" {
     accessToken?: string;
     googleAccessToken?: string;
     githubAccessToken?: string;
-    googleDriveAccessToken?: string;
-    googleMailAccessToken?: string;
     DiscordAccessToken?: string;
     SlackAccessToken?: string;
     NotionAccessToken?: string;
@@ -15,8 +13,6 @@ declare module "next-auth" {
     accessToken?: string;
     googleAccessToken?: string;
     githubAccessToken?: string;
-    googleDriveAccessToken?: string;
-    googleMailAccessToken?: string;
     DiscordAccessToken?: string;
     SlackAccessToken?: string;
     NotionAccessToken?: string;

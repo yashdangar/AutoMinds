@@ -2,14 +2,9 @@ import { Connection } from "./types";
 
 export const CONNECTIONS: Connection[] = [
     {
-      title: 'Google Drive',
+      title: 'Google',
       description: 'Connect your google drive to listen to folder changes',
-      image: '/googleDrive.png'
-    },
-    {
-        title: 'G-Mail',
-        description: 'Connect your google mail to send / recieve to mails on particular events',
-        image: '/gmail.png'
+      image: '/google.png'
     },
     {
       title: 'Discord',
@@ -20,12 +15,6 @@ export const CONNECTIONS: Connection[] = [
       title: 'Notion',
       description: 'Create entries in your notion dashboard and automate tasks.',
       image: '/notion.png',
-    },
-    {
-      title: 'Slack',
-      description:
-        'Use slack to send notifications to team members through your own custom bot.',
-      image: '/slack.png'
     },
     {
       title: 'Github',
