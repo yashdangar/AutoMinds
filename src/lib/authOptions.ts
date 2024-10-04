@@ -3,14 +3,14 @@ import GoogleProvider from 'next-auth/providers/google';
 import GithubProvider from 'next-auth/providers/github';
 import prisma from "./db";
 
-export const authOptions : AuthOptions = {
+export const authOptions: AuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
       authorization: {
         params: {
-          scope: 'openid email profile https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/drive',
+          scope: 'openid email profile https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/drive  https://www.googleapis.com/auth/classroom.courses.readonly https://www.googleapis.com/auth/classroom.rosters https://www.googleapis.com/auth/spreadsheets',
         },
       },
     }),
@@ -33,10 +33,9 @@ export const authOptions : AuthOptions = {
       if (account) {
         if (account.provider === 'google') {
           token.googleAccessToken = account.access_token;
-          console.log(token.googleAccessToken)
+          console.log("Token", token);
         } else if (account.provider === 'github') {
           token.githubAccessToken = account.access_token;
-          console.log(token.googleAccessToken)
         }
       }
       return token;
@@ -44,7 +43,6 @@ export const authOptions : AuthOptions = {
     async session({ session, token }: any) {
       session.googleAccessToken = token.googleAccessToken;
       session.githubAccessToken = token.githubAccessToken;
-      // console.log(session.user.image);
       return session;
     },
     async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {

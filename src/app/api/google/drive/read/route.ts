@@ -1,39 +1,35 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from "@/lib/authOptions";
-import axios from 'axios';
+import { google } from 'googleapis';
 
-export async function GET(request: Request) {
-  const session = await getServerSession(authOptions);
-  
-  if (!session || !session.googleAccessToken) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+export async function GET(req: Request) {
 
-  const { searchParams } = new URL(request.url);
-  const fileId = searchParams.get('fileId');
+  // const session = await getServerSession(authOptions);
+  // if (!session) {
+  //   return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+  // }
+
+  const data = await req.json();
+  const fileId = data.fileId;
 
   if (!fileId) {
     return NextResponse.json({ error: 'File ID is required' }, { status: 400 });
   }
 
+  const auth = new google.auth.OAuth2();
+  auth.setCredentials({ access_token: "ya29.a0AcM612zOldin1W8URTQ-7sg-xxC0q-fRSatHGzSoFnO5XN1gB8WtGmtyEFm9xZMRvn5uJ-sMbAx-cop52Z-_TrP-rVKgVBke6YqtA-wZXb6tUYmW8Gex0QoozPfshUzJc1D454W_8LPVxd1rrskkjJtv7tbH4sg-VohYDsf8aCgYKAaYSARISFQHGX2MivRbNwMbFYJ9CQauutja0zw0175" });
+
   try {
-    const response = await axios.get(`https://www.googleapis.com/drive/v3/files/${fileId}/download`, {
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-        'Accept': 'application/json',
-      },
+    const drive = google.drive({ version: 'v3', auth });
+
+    const file = await drive.files.get({
+      fileId: fileId,
+      alt: 'media',
     });
-    console.log(response.data);
-    // {
-    //     kind: 'drive#file',
-    //     id: '1uHBW9Bd4O9W19iCq1Vc9riu5Gf4RuPmoCwnzU5cXYzo',
-    //     name: 'zapy',
-    //     mimeType: 'application/vnd.google-apps.document'
-    //   }
-    return NextResponse.json(response.data);
+
+    const content = file.data;
+
+    return NextResponse.json(content, { status: 200 });
   } catch (error) {
-    console.log(error);
     return NextResponse.json({ error: 'Failed to read file' }, { status: 500 });
   }
 }

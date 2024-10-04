@@ -19,7 +19,10 @@ datasource db {
 model User {
   id        String @id @default(uuid())
   name      String
-  GoogleId  String
+  imageUrl  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // This will point to the AccessToken table , where we store access tokens for different services / scopes 
   AccessToken AccessToken?
@@ -78,12 +81,10 @@ model Edge  {
   workflow   Workflow @relation("WorkflowEdges", fields: [workflowId], references: [id]) // Many-to-one relationship with Workflow
 }
 
-//  WIP : have to add models for GOOGLEDRIVENODE , GMAILNODE , GITHUBNODE , NOTIONNODE , SLACKNODE , DISCORDNODE
 
 enum NodeType {
   Google
   Github
   Discord
   Notion 
-  Slack 
 }

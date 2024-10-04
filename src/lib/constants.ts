@@ -23,3 +23,15 @@ export const CONNECTIONS: Connection[] = [
       image: '/github.png'
     }
 ]
+
+export const MimeType = {
+  TEXT: 'text/plain',
+  HTML: 'text/html',
+  MARKDOWN: 'text/markdown',
+  CSV: 'text/csv',
+  LATEX: 'application/x-latex',
+  WORD: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  GOOGLE_SHEET: 'application/vnd.google-apps.spreadsheet',
+  EXCEL: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  POWERPOINT: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+};
