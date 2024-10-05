@@ -83,7 +83,7 @@ const InfoBar = () => {
                     src={
                       status === "authenticated"
                         ? imageUrl || "/deafult-person.png"
-                        : "/default-person.png"
+                        : "/deafult-person.png"
                     }
                     width={500}
                     height={500}

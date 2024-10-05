@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
+import crypto from "crypto";
 
 type Props = {
   type: ConnectionTypes;
@@ -16,7 +17,7 @@ type Props = {
   title: ConnectionTypes;
   description: string;
   callback?: () => void;
-  connected: string[] ;
+  connected: string[];
 };
 
 const ConnectionCard = ({
@@ -28,21 +29,16 @@ const ConnectionCard = ({
 }: Props) => {
 
 
+  const generateRandomString = () => {
+    return crypto.randomBytes(20).toString('hex');
+  }
   const handleClick = (type: ConnectionTypes) => {
-    if(type === "Google") {
+    if (type === "Google") {
       signIn("google");
-    }
-    else if(type === "Slack") {
-      signIn("slack");
-    }
-    else if(type === "Notion") {
-      signIn("notion")
-    }
-    else if(type === "Discord") {
-      signIn("discord");
-    }
-    else if(type === "Github") {
-      signIn("github");
+    } else if (type === "Github") {
+      console.log(process.env.GITHUB_CLIENT_ID);
+      
+      window.location.href = `https://github.com/login/oauth/authorize?client_id=Ov23liAkBOVl2yyHb3My&scope=repo%20user%20gist%20notifications%20read%3Aorg&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fgithub%2Fcallback&state=${generateRandomString()}`;
     }
   };
   
@@ -70,7 +66,7 @@ const ConnectionCard = ({
           </div>
         ) : (
           <div
-            onClick={() => {handleClick(type)}}
+            onClick={() => { handleClick(type); }}
             className=" rounded-lg bg-primary p-2 font-bold text-primary-foreground cursor-pointer"
           >
             Connect

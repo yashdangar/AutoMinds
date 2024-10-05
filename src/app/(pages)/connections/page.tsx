@@ -1,24 +1,27 @@
 "use client"
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { CONNECTIONS } from "@/lib/constants";
 import ConnectionCard from "./_components/Card"
 import { Connection } from "@/lib/types";
 import getConnections from "@/app/actions/getConnections";
 
 function Connections() {
-
   const [connections, setConnections] = useState<string[]>([]);
 
-  const fetchConnections = async () => {
+  const fetchConnections = useCallback(async () => {
     const connections = await getConnections();
-    if(connections){
+    if (connections) {
       setConnections(connections);
     }
-  }
-  
-  useEffect(()=>{
+  }, []);
+
+  useEffect(() => {
     fetchConnections();
-  },[connections,setConnections]);
+  }, [fetchConnections]);
+
+  const cachedConnections = useMemo(() => {
+    return connections;
+  }, [connections]);
 
   return (
     <div className="flex flex-wrap justify-start mx-[3vw]">
@@ -26,7 +29,7 @@ function Connections() {
         return (
           <div key={idx} className="mx-1 my-3">
             <ConnectionCard
-              connected={connections}
+              connected={cachedConnections}
               type={connection.title}
               icon={connection.image}
               title={connection.title}
