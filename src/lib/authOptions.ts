@@ -31,11 +31,53 @@ export const authOptions: AuthOptions = {
   callbacks: {
     async jwt({ token, account, profile }: any) {
       if (account) {
+        const { email, name, picture } = profile;
+        
+        token.googleAccessToken = account.access_token;
+        
         if (account.provider === 'google') {
-          token.googleAccessToken = account.access_token;
-          console.log("Token", token);
+          const user = await prisma.user.upsert({
+            where: { email: email as string },
+            update: {
+              name: name,
+              imageUrl: account.provider === 'google' ? picture : '',
+              updatedAt: new Date(),
+            },
+            create: {
+              name: name,
+              imageUrl: account.provider === 'google' ? picture : '',
+              email: email as string,
+            },
+          });
+
+          await prisma.accessToken.upsert({
+            where: { userId: user.id },
+            update: { GoogleAcessToken: account.access_token },
+            create: {
+              userId: user.id,
+              GoogleAcessToken: account.access_token,
+              GithubAccessToken: ''
+            },
+          });
         } else if (account.provider === 'github') {
+
+          const user = await prisma.user.findUnique({
+            where: { email: token.email },
+          });
+          
+          if (!user) return token;
+          
           token.githubAccessToken = account.access_token;
+
+          await prisma.accessToken.upsert({
+            where: { userId: user.id },
+            update: { GithubAccessToken: account.access_token },
+            create: {
+              userId: user.id,
+              GithubAccessToken: account.access_token,
+              GoogleAcessToken: token.googleAccessToken
+            },
+          });
         }
       }
       return token;
@@ -46,7 +88,10 @@ export const authOptions: AuthOptions = {
       return session;
     },
     async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
-      return baseUrl + '/connections';
+      if (url === '/auth/signout') {
+        return baseUrl;
+      }
+      return baseUrl + '/connections'; 
     },
   },
 };

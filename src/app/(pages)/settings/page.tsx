@@ -5,7 +5,7 @@ import React from 'react'
 function Settings() {
   return (
     <div>
-      <button onClick={() => signOut()}>Signout</button>
+      <button onClick={() => signOut({callbackUrl:"/"})}>Signout</button>
     </div>
   )
 }

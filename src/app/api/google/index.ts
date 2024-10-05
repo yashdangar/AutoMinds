@@ -2,8 +2,23 @@ import { google } from "googleapis";
 import prisma from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
+import {
+  createFile,
+  deleteFile,
+  getAllfiles,
+  readFile,
+  updateFile
+} from "../google/drive/index"
+import {
+  addLabel, removeLabel,
+  createLabel,
+  deleteEmail,
+  searchEmails,
+  sendEmail,
+  createAndSendDraftEmail
+} from "../google/gmail/index"
 
-export async function getGoogleInstance() {
+async function getGoogleInstance() {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user?.email) {
@@ -32,3 +47,5 @@ export async function getGoogleInstance() {
 
   return { user, drive, gmail };
 }
+
+export { createFile, deleteFile, getAllfiles, readFile, updateFile, addLabel, removeLabel, createLabel, deleteEmail, searchEmails, sendEmail, createAndSendDraftEmail,getGoogleInstance };

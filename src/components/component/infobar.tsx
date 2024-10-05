@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import {
@@ -9,8 +9,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import Image from "next/image";
+import getImageURL from "@/app/actions/getImage";
 
 const InfoBar = () => {
+  const [imageUrl, setImageUrl] = useState("");
   const router = useRouter();
   const pathname = usePathname();
   const { data: session, status } = useSession();
@@ -21,6 +23,16 @@ const InfoBar = () => {
 
   if (pathname.includes("editor")) formattedPath = "Editor";
 
+  useEffect(()=>{
+    const getImage = async () => {
+      const imageUrl2 = await getImageURL();
+      // console.log("imageUrl2" + imageUrl2);
+      if(imageUrl2){
+        setImageUrl(imageUrl2);
+      }
+    }
+    getImage();
+  },[imageUrl,setImageUrl])
   return (
     <TooltipProvider>
       <Tooltip>
@@ -70,7 +82,7 @@ const InfoBar = () => {
                   <Image
                     src={
                       status === "authenticated"
-                        ? session?.user?.image || "/default-person.png"
+                        ? imageUrl || "/deafult-person.png"
                         : "/default-person.png"
                     }
                     width={500}

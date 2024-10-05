@@ -1,11 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-
 // WIP : have to add the schema 
+
+// when u do changes in the schema , you have to run npx prisma generate , which will help u to give corrrect types and suggestions in the code
 generator client {
   provider = "prisma-client-js"
 }
@@ -21,6 +16,7 @@ model User {
   name      String
   imageUrl  String
   email     String @unique
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -33,15 +29,11 @@ model User {
 
 model AccessToken {
   id       String @id @default(uuid())
-  token     String
   userId    String @unique
   user      User   @relation(fields: [userId], references: [id])
 
-  GoogleAcessToken String @unique
-  GithubAccessToken String @unique
-  NotionAccessToken String @unique
-  SlackAccessToken String @unique
-  DiscordAccessToken String @unique
+  GoogleAcessToken String @default("")
+  GithubAccessToken String @default("")
 }
 
 model Workflow {
@@ -84,7 +76,5 @@ model Edge  {
 
 enum NodeType {
   Google
-  Github
-  Discord
-  Notion 
+  Github 
 }

@@ -1,16 +1,32 @@
-import React from "react";
+"use client"
+import React, { useEffect, useState } from "react";
 import { CONNECTIONS } from "@/lib/constants";
 import ConnectionCard from "./_components/Card"
 import { Connection } from "@/lib/types";
+import getConnections from "@/app/actions/getConnections";
 
 function Connections() {
+
+  const [connections, setConnections] = useState<string[]>([]);
+
+  const fetchConnections = async () => {
+    const connections = await getConnections();
+    if(connections){
+      setConnections(connections);
+    }
+  }
+  
+  useEffect(()=>{
+    fetchConnections();
+  },[connections,setConnections]);
+
   return (
     <div className="flex flex-wrap justify-start mx-[3vw]">
       {CONNECTIONS.map((connection: Connection, idx: number) => {
         return (
           <div key={idx} className="mx-1 my-3">
             <ConnectionCard
-              connected={""}
+              connected={connections}
               type={connection.title}
               icon={connection.image}
               title={connection.title}
