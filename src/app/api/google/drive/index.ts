@@ -32,7 +32,6 @@ export async function createFile(data: {name : string , mimeType : string , body
     console.error('Error creating file:');
     return { error: 'Failed to create file'};
   }
-
 }
 
 export async function deleteFile(data : {fileId : string}) {
