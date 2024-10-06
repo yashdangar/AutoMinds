@@ -36,9 +36,7 @@ const ConnectionCard = ({
     if (type === "Google") {
       signIn("google");
     } else if (type === "Github") {
-      console.log(process.env.GITHUB_CLIENT_ID);
-      
-      window.location.href = `https://github.com/login/oauth/authorize?client_id=Ov23liF8APtIGZxmwZtz&scope=repo%20user%20gist%20notifications%20read%3Aorg&response_type=code&redirect_uri=https%3A%2F%2Fauto-minds-six.vercel.app%2Fapi%2Fgithub%2Fcallback&state=${generateRandomString()}`;
+      window.location.href = process.env.NEXT_PUBLIC_GITHUB_URL!;
     }
   };
   

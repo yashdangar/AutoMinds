@@ -14,15 +14,6 @@ export const authOptions: AuthOptions = {
         },
       },
     }),
-    // GithubProvider({
-    //   clientId: process.env.GITHUB_CLIENT_ID as string,
-    //   clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
-    //   authorization: {
-    //     params: {
-    //       scope: 'repo user gist notifications read:org',
-    //     },
-    //   },
-    // }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
