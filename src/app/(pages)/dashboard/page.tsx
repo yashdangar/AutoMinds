@@ -1,21 +1,13 @@
 "use client";
-import React from 'react';
-import { createFile, deleteFile, getAllfiles, readFile, updateFile, addLabel, removeLabel, createLabel, deleteEmail, searchEmails, sendEmail, createAndSendDraftEmail,getGoogleInstance } from "../../api/google/index";
-
+import React, { useState } from "react";
 
 function Dashboard() {
-
-  const handeClick = () => {
-    
-  }
-
+  
   return (
     <div>
-      <button onClick={handeClick}>
-        Touch it to see the magic
-      </button>
+      uhfuish
     </div>
-  )
+  );
 }
 
-export default Dashboard
+export default Dashboard;

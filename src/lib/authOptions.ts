@@ -5,11 +5,11 @@ import axios from "axios";
 
 function isAccessTokenExpired(expirationTime: Date) {
   const currentTime = new Date();
-  console.log('isAccessTokenExpired======================================================');
-  console.log('Current Time:', currentTime);
-  console.log('Expiration Time:', expirationTime);
-  console.log('Is Expired:', expirationTime <= currentTime);
-  console.log('isAccessTokenExpired======================================================');
+  // console.log('isAccessTokenExpired======================================================');
+  // console.log('Current Time:', currentTime);
+  // console.log('Expiration Time:', expirationTime);
+  // console.log('Is Expired:', expirationTime <= currentTime);
+  // console.log('isAccessTokenExpired======================================================');
   return expirationTime <= currentTime;
 }
 
@@ -26,9 +26,9 @@ async function refreshAccessToken(token: any) {
 
     const refreshedTokens = response.data;
 
-  console.log('refresh token ======================================================');
-    console.log('Refreshed Tokens:', refreshedTokens);
-  console.log('refresh token ======================================================');
+  // console.log('refresh token ======================================================');
+  //   console.log('Refreshed Tokens:', refreshedTokens);
+  // console.log('refresh token ======================================================');
 
     const user = await prisma.user.findUnique({
       where: {
@@ -57,7 +57,7 @@ async function refreshAccessToken(token: any) {
       refreshToken: refreshedTokens.refresh_token ?? token.refreshToken,
     };
   } catch (error) {
-    console.error('Error refreshing access token:', error);
+    // console.error('Error refreshing access token:', error);
     return {
       ...token,
       error: 'RefreshAccessTokenError',
@@ -72,8 +72,8 @@ export const authOptions: AuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
       authorization: {
         params: {
-          scope: 'openid email profile https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/classroom.courses.readonly https://www.googleapis.com/auth/classroom.rosters https://www.googleapis.com/auth/spreadsheets',
-          access_type: 'offline', // Add this line to request offline access
+          scope: 'openid email profile https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/classroom.courses.readonly https://www.googleapis.com/auth/classroom.rosters https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/gmail.modify https://mail.google.com/ ',
+          access_type: 'offline', 
         },
       },
     }),
@@ -89,7 +89,7 @@ export const authOptions: AuthOptions = {
         token.refreshToken = account.refresh_token;
         token.accessTokenExpires = account.expires_at * 1000;
         token.email = profile.email;
-        console.log('Token 1 ', token);
+        // console.log('Token 1 ', token);
 
         const user = await prisma.user.upsert({
           where: { email: profile.email },
@@ -104,24 +104,23 @@ export const authOptions: AuthOptions = {
             email: profile.email,
           },
         });
-        console.log("User created /  inserted : 2 ", user.id);
+        // console.log("User created /  inserted : 2 ", user.id);
 
         await prisma.accessToken.upsert({
           where: { userId: user.id },
           update: {
             GoogleAccessToken: token.accessToken,
-            GoogleAccessTokenExpireAt: new Date(token.accessTokenExpires), // Store as DateTime
+            GoogleAccessTokenExpireAt: new Date(token.accessTokenExpires),
             GoogleRefreshToken: token.refreshToken,
           },
           create: {
             GoogleAccessToken: token.accessToken,
-            GoogleAccessTokenExpireAt: new Date(token.accessTokenExpires), // Store as DateTime
+            GoogleAccessTokenExpireAt: new Date(token.accessTokenExpires),
             GoogleRefreshToken: token.refreshToken,
             userId: user.id,
           },
         });
       }
-// 3:41 thai che =>  4:41 ee jova nu che ke new token aave toh refresh token che 
       if (isAccessTokenExpired(new Date(token.accessTokenExpires))) {
         console.log("Going to find new accesstoken using refresh token");
         return refreshAccessToken(token);
