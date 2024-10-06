@@ -1,7 +1,69 @@
 import { AuthOptions } from "next-auth";
 import GoogleProvider from 'next-auth/providers/google';
-import GithubProvider from 'next-auth/providers/github';
 import prisma from "./db";
+import axios from "axios";
+
+function isAccessTokenExpired(expirationTime: Date) {
+  const currentTime = new Date();
+  console.log('isAccessTokenExpired======================================================');
+  console.log('Current Time:', currentTime);
+  console.log('Expiration Time:', expirationTime);
+  console.log('Is Expired:', expirationTime <= currentTime);
+  console.log('isAccessTokenExpired======================================================');
+  return expirationTime <= currentTime;
+}
+
+async function refreshAccessToken(token: any) {
+  try {
+    const response = await axios.post('https://oauth2.googleapis.com/token', null, {
+      params: {
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        refresh_token: token.refreshToken,
+        grant_type: 'refresh_token',
+      },
+    });
+
+    const refreshedTokens = response.data;
+
+  console.log('refresh token ======================================================');
+    console.log('Refreshed Tokens:', refreshedTokens);
+  console.log('refresh token ======================================================');
+
+    const user = await prisma.user.findUnique({
+      where: {
+        email: token.email,
+      },
+    });
+
+    if (!user) {
+      return { ...token, error: 'UserNotFound' };
+    }
+
+    await prisma.accessToken.update({
+      where: {
+        userId: user.id,
+      },
+      data: {
+        GoogleAccessToken: refreshedTokens.access_token,
+        GoogleAccessTokenExpireAt: new Date(Date.now() + refreshedTokens.expires_in * 1000) // Store as DateTime
+      },
+    });
+
+    return {
+      ...token,
+      accessToken: refreshedTokens.access_token,
+      accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
+      refreshToken: refreshedTokens.refresh_token ?? token.refreshToken,
+    };
+  } catch (error) {
+    console.error('Error refreshing access token:', error);
+    return {
+      ...token,
+      error: 'RefreshAccessTokenError',
+    };
+  }
+}
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -10,7 +72,8 @@ export const authOptions: AuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
       authorization: {
         params: {
-          scope: 'openid email profile https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/drive  https://www.googleapis.com/auth/classroom.courses.readonly https://www.googleapis.com/auth/classroom.rosters https://www.googleapis.com/auth/spreadsheets',
+          scope: 'openid email profile https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/classroom.courses.readonly https://www.googleapis.com/auth/classroom.rosters https://www.googleapis.com/auth/spreadsheets',
+          access_type: 'offline', // Add this line to request offline access
         },
       },
     }),
@@ -22,67 +85,62 @@ export const authOptions: AuthOptions = {
   callbacks: {
     async jwt({ token, account, profile }: any) {
       if (account) {
-        const { email, name, picture } = profile;
-        
-        token.googleAccessToken = account.access_token;
-        
-        if (account.provider === 'google') {
-          const user = await prisma.user.upsert({
-            where: { email: email as string },
-            update: {
-              name: name,
-              imageUrl: account.provider === 'google' ? picture : '',
-              updatedAt: new Date(),
-            },
-            create: {
-              name: name,
-              imageUrl: account.provider === 'google' ? picture : '',
-              email: email as string,
-            },
-          });
+        token.accessToken = account.access_token;
+        token.refreshToken = account.refresh_token;
+        token.accessTokenExpires = account.expires_at * 1000;
+        token.email = profile.email;
+        console.log('Token 1 ', token);
 
-          await prisma.accessToken.upsert({
-            where: { userId: user.id },
-            update: { GoogleAcessToken: account.access_token },
-            create: {
-              userId: user.id,
-              GoogleAcessToken: account.access_token,
-              GithubAccessToken: ''
-            },
-          });
-        } else if (account.provider === 'github') {
+        const user = await prisma.user.upsert({
+          where: { email: profile.email },
+          update: {
+            name: profile.name,
+            imageUrl: account.provider === 'google' ? profile.picture : '',
+            updatedAt: new Date(),
+          },
+          create: {
+            name: profile.name,
+            imageUrl: account.provider === 'google' ? profile.picture : '',
+            email: profile.email,
+          },
+        });
+        console.log("User created /  inserted : 2 ", user.id);
 
-          const user = await prisma.user.findUnique({
-            where: { email: token.email },
-          });
-          
-          if (!user) return token;
-
-          token.githubAccessToken = account.access_token;
-
-          await prisma.accessToken.upsert({
-            where: { userId: user.id },
-            update: { GithubAccessToken: account.access_token },
-            create: {
-              userId: user.id,
-              GithubAccessToken: account.access_token,
-              GoogleAcessToken: token.googleAccessToken
-            },
-          });
-        }
+        await prisma.accessToken.upsert({
+          where: { userId: user.id },
+          update: {
+            GoogleAccessToken: token.accessToken,
+            GoogleAccessTokenExpireAt: new Date(token.accessTokenExpires), // Store as DateTime
+            GoogleRefreshToken: token.refreshToken,
+          },
+          create: {
+            GoogleAccessToken: token.accessToken,
+            GoogleAccessTokenExpireAt: new Date(token.accessTokenExpires), // Store as DateTime
+            GoogleRefreshToken: token.refreshToken,
+            userId: user.id,
+          },
+        });
+      }
+// 3:41 thai che =>  4:41 ee jova nu che ke new token aave toh refresh token che 
+// ya29.a0AcM612z9NCi43UdcnQ4xsRifOn499Mt8U4ggjS_2w3aSr1mUwyrfBz8qVRR6T8mofDwXMEgKmq8xlaNbhIvFNzY3vRcfCMw0yeQmbdi1ugFZsQKa1o73OWh8xMJtaW7jZGcEgMVu6dXaMJLqsdIObi7BN_8DY8c1aD4z-uHzaCgYKAQoSARISFQHGX2MiY3tfHN8qLN4R9PTK9WAbBg0175
+      if (isAccessTokenExpired(new Date(token.accessTokenExpires))) {
+        console.log("Going to find new accesstoken using refresh token");
+        return refreshAccessToken(token);
       }
       return token;
     },
     async session({ session, token }: any) {
-      session.googleAccessToken = token.googleAccessToken;
-      session.githubAccessToken = token.githubAccessToken;
+      session.accessToken = token.accessToken;
+      session.refreshToken = token.refreshToken;
+      session.email = token.email;
+      session.exiperesAt = token.accessTokenExpires;
       return session;
     },
     async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
       if (url === '/auth/signout') {
         return baseUrl;
       }
-      return baseUrl + '/connections'; 
+      return baseUrl + '/connections';
     },
   },
 };

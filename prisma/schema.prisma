@@ -12,29 +12,27 @@ datasource db {
 }
 
 model User {
-  id        String @id @default(uuid())
-  name      String
-  imageUrl  String
-  email     String @unique
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // This will point to the AccessToken table , where we store access tokens for different services / scopes 
+  id          String   @id @default(uuid())
+  name        String
+  imageUrl    String
+  email       String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   AccessToken AccessToken?
-
-  // This will point to the Workflow table , where we store the workflows created by the user (one to many relation)
-  Workflows Workflow[]
+  Workflows    Workflow[]
 }
 
 model AccessToken {
-  id       String @id @default(uuid())
-  userId    String @unique
-  user      User   @relation(fields: [userId], references: [id])
+  id                     String   @id @default(uuid())
+  userId                 String   @unique
+  user                   User     @relation(fields: [userId], references: [id])
 
-  GoogleAcessToken String @default("")
-  GithubAccessToken String @default("")
+  GoogleAccessToken      String   @default("")
+  GoogleRefreshToken     String   @default("")
+  GoogleAccessTokenExpireAt DateTime 
+  GithubAccessToken      String   @default("")
 }
+
 
 model Workflow {
   id          String   @id @default(uuid())
