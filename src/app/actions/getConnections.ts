@@ -26,7 +26,7 @@ export default async function getConnections(){
 
     if(!accessToken) return arr;
 
-    if(accessToken.GoogleAcessToken !== ""){
+    if(accessToken.GoogleAccessToken !== ""){
         arr.push("Google");
     }
     if(accessToken.GithubAccessToken !== ""){
