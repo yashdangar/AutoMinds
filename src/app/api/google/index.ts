@@ -21,7 +21,6 @@ async function getGoogleInstance() {
   return { drive, gmail };
 }
 
-
 // Google mail functions
 async function addLabel(data: { messageId: string, labelId: string }) {
   const googleInstance = await getGoogleInstance();
@@ -84,7 +83,6 @@ async function ListEmails(data: { maxResults: number }) {
     return { error: 'Failed to list emails' };
   }
 }
-
 
 async function removeLabel(data: {
   messageId
@@ -216,7 +214,6 @@ async function searchEmails(data: { query: string, maxResults: number }) {
   }
 }
 
-
 async function createAndSendDraftEmail(data: { to: string, subject: string, body: string }) {
   const googleInstance = await getGoogleInstance();
   if (!googleInstance) {
@@ -258,8 +255,8 @@ async function createAndSendDraftEmail(data: { to: string, subject: string, body
   }
 }
 
-// Google drive functions
 
+// Google drive functions
 async function createFile(data: { name: string, mimeType: string, body: string }) {
   const googleInstance = await getGoogleInstance();
 
@@ -412,6 +409,5 @@ async function updateFile(data: { fileId: string, body: string }) {
     return { error: 'Failed to update file' };
   }
 }
-
 
 export { createFile, deleteFile, getAllfiles, readFile, updateFile, addLabel, removeLabel, createLabel, deleteEmail, searchEmails, sendEmail, createAndSendDraftEmail, getGoogleInstance, ListLabels, ListEmails };

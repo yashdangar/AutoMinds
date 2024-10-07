@@ -34,7 +34,6 @@ export async function GET(request: Request) {
     }
 
     try {
-        // Exchange code for access token
         const tokenResponse = await axios.post(
             "https://github.com/login/oauth/access_token",
             {
