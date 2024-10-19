@@ -1,14 +1,15 @@
 "use client"
 import { useSession } from 'next-auth/react'
 import Link from 'next/link';
+import { ModeToggle } from '../ui/theme-button';
 
 const Navbar = () => {
   const { data : session , status } = useSession();
 
   return (
-    <header className="fixed right-0 left-0 top-0 py-4 px-4 dark:bg-neutral-950 bg-white backdrop-blur-lg z-[100] flex items-center border-b-[1px] border-neutral-900 justify-between ">
+    <header className="fixed right-0 left-0 top-0 py-4 px-4 bg-neutral-950 backdrop-blur-lg z-[100] flex items-center border-b-[1px] border-neutral-900 justify-between ">
       <aside className="flex items-center gap-[2px]">
-        <p className="text-3xl pl-[20px] font-bold dark:text-[#fff] text-[#000]">AutoMinds</p>
+        <p className="text-3xl pl-[20px] font-bold text-[#fff] ">AutoMinds</p>
       </aside>
       <aside className="flex items-center gap-4">
         <Link
@@ -22,6 +23,7 @@ const Navbar = () => {
             {status === "authenticated" ? 'Dashboard' : 'Sign In'}
           </span>
         </Link>
+        {/* <ModeToggle></ModeToggle> */}
       </aside>
     </header>
   )

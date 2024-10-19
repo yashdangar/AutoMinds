@@ -27,9 +27,11 @@ model AccessToken {
   userId                 String   @unique
   user                   User     @relation(fields: [userId], references: [id])
 
-  GoogleAccessToken      String   @default("")
   GoogleRefreshToken     String   @default("")
   GoogleAccessTokenExpireAt DateTime 
+
+  // All AccessTokens should be here and name should be of '${ConnectionType}AccessToken' type and here ConnectionType is in libs/types.ts
+  GoogleAccessToken      String   @default("")
   GithubAccessToken      String   @default("")
 }
 
@@ -39,6 +41,8 @@ model Workflow {
   name        String
   description String
   userId      String
+  status      WorkflowStatus @default(draft)
+
   user        User     @relation(fields: [userId], references: [id])
   nodes       Node[]   @relation("WorkflowNodes") // One-to-many relationship with Node
   edges       Edge[]   @relation("WorkflowEdges") // One-to-many relationship with Edge
@@ -71,8 +75,13 @@ model Edge  {
   workflow   Workflow @relation("WorkflowEdges", fields: [workflowId], references: [id]) // Many-to-one relationship with Workflow
 }
 
-
 enum NodeType {
   Google
   Github 
+}
+
+enum WorkflowStatus {
+  active
+  inactive
+  draft
 }

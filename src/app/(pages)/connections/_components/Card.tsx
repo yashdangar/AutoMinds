@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { ConnectionTypes } from "@/lib/types";
 import React from "react";
 import {
@@ -8,15 +8,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Image from "next/image";
-import { signIn } from "next-auth/react";
-import crypto from "crypto";
+import { signIn, signOut } from "next-auth/react";
+import removeAccessToken from "@/app/actions/removeAccessToken";
 
 type Props = {
   type: ConnectionTypes;
   icon: string;
   title: ConnectionTypes;
   description: string;
-  callback?: () => void;
+  callback: () => void;
   connected: string[];
 };
 
@@ -26,12 +26,9 @@ const ConnectionCard = ({
   icon,
   title,
   connected,
+  callback,
 }: Props) => {
 
-
-  const generateRandomString = () => {
-    return crypto.randomBytes(20).toString('hex');
-  }
   const handleClick = (type: ConnectionTypes) => {
     if (type === "Google") {
       signIn("google");
@@ -39,7 +36,17 @@ const ConnectionCard = ({
       window.location.href = process.env.NEXT_PUBLIC_GITHUB_URL!;
     }
   };
-  
+
+  const handleDisconnect = async (type: ConnectionTypes) => {
+    if(type === "Google"){
+      signOut();
+    }
+     const res = await removeAccessToken(type);
+     if(res === "Aceess Token Removed"){
+        callback(); 
+     }
+  }
+
   return (
     <Card className="flex w-[45vw] items-center justify-between ">
       <CardHeader className="flex flex-col gap-4">
@@ -59,13 +66,18 @@ const ConnectionCard = ({
       </CardHeader>
       <div className="flex flex-col items-center gap-2 p-4">
         {connected.includes(type) ? (
-          <div className="border-bg-primary rounded-lg border-2 px-3 py-2 font-bold text-white">
-            Connected
+          <div
+            className="border-bg-primary rounded-lg border-2 px-3 py-2 font-bold text-white bg-red-700 cursor-pointer"
+            onClick={()=>handleDisconnect(type)}
+          >
+            Disconnect
           </div>
         ) : (
           <div
-            onClick={() => { handleClick(type); }}
-            className=" rounded-lg bg-primary p-2 font-bold text-primary-foreground cursor-pointer"
+            onClick={() => {
+              handleClick(type);
+            }}
+            className="rounded-lg bg-primary p-2 font-bold text-primary-foreground cursor-pointer"
           >
             Connect
           </div>

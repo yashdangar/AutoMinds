@@ -1,7 +1,7 @@
-"use client"
+"use client";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { CONNECTIONS } from "@/lib/constants";
-import ConnectionCard from "./_components/Card"
+import ConnectionCard from "./_components/Card";
 import { Connection } from "@/lib/types";
 import getConnections from "@/app/actions/getConnections";
 
@@ -34,6 +34,7 @@ function Connections() {
               icon={connection.image}
               title={connection.title}
               description={connection.description}
+              callback={fetchConnections}
             />
           </div>
         );

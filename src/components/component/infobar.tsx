@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import {
   Tooltip,
   TooltipContent,
@@ -76,7 +76,7 @@ const InfoBar = () => {
               </div>
               <div
                 className="pr-4 cursor-pointer"
-                onClick={() => router.push("/settings")}
+                onDoubleClick={() => signOut()}
               >
                 <TooltipTrigger>
                   <Image
@@ -92,7 +92,7 @@ const InfoBar = () => {
                   />
                 </TooltipTrigger>
                 <TooltipContent className="bg-black/10 backdrop-blur-xl text-white text-[14px]">
-                  <p>Settings</p>
+                  <p>Double click to Logout </p>
                 </TooltipContent>
               </div>
             </div>
