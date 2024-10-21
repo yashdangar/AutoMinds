@@ -12,17 +12,23 @@ export default async function getWorkflows(){
         where: {
             email: session.user.email,
         },
+        include : {
+            Workflows : true
+        },
+        cacheStrategy : {
+            ttl: 60,
+            swr: 60
+        }
     });
 
     if(!user){
         return null;
     }
 
-    const workflows = await prisma.workflow.findMany({
-        where : {
-            userId : user.id
-        }
-    })
-    console.log(workflows);
+    const workflows = user.Workflows.map((workflow) => ({
+        ...workflow,
+        lastRun: workflow?.lastRun ? workflow?.lastRun : null, 
+    }));
+
     return workflows;
 }

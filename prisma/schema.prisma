@@ -43,6 +43,7 @@ model Workflow {
   userId      String
   status      WorkflowStatus @default(draft)
 
+  lastRun     String?
   user        User     @relation(fields: [userId], references: [id])
   nodes       Node[]   @relation("WorkflowNodes") // One-to-many relationship with Node
   edges       Edge[]   @relation("WorkflowEdges") // One-to-many relationship with Edge

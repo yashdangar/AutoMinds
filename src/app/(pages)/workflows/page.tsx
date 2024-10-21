@@ -12,28 +12,28 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import getWorkflows from "@/app/actions/getWorkflows"
+import { useRouter } from "next/navigation"
 
 type Workflow = {
   id: string
   name: string
   description: string
-  status?: "active" | "inactive" | "draft"
-  lastRun?: string
+  status: "active" | "inactive" | "draft"
+  lastRun: string | null
 }
 
 export default function Workflows() {
   const [workflows, setWorkflows] = useState<Workflow[]>([])
   const [searchTerm, setSearchTerm] = useState("")
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchWorkflows() {
       const data = await getWorkflows()
       if (data) {
-        // Assuming the API returns the status and lastRun fields
         setWorkflows(data)
       }
     }
-
     fetchWorkflows()
   }, [])
 
@@ -77,7 +77,7 @@ export default function Workflows() {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button variant="outline" className="w-full">View Details</Button>
+                <Button variant="outline" className="w-full" onClick={()=>router.push(`/workflows/${workflow.id}`)}>View Details</Button>
               </CardFooter>
             </Card>
           ))}

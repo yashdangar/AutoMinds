@@ -4,13 +4,15 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 
 async function getGoogleInstance() {
-  const session = await getServerSession(authOptions);
+  // const session = await getServerSession(authOptions);
 
-  if (!session || !session.user?.email || !session.accessToken) {
-    return null;
-  }
-  // console.log('Session : ', session);
-  const access_token = session.accessToken;
+  // if (!session || !session.user?.email || !session.accessToken) {
+  //   return null;
+  // }
+  // // console.log('Session : ', session);
+  // const access_token = session.accessToken;
+
+  const access_token = "ya29.a0AcM612xv4g4vjltyOopCgtgUoP1hHhNL3d4mzMmn0KwKNMYr8AHjHJiHER2SocYIMZcTkja9HU_rv4mtUG_iWnAaB6DoGl07jFcBrNEt427WjobJt1TcBOfVdZwmuqAtij_viLv4tKpU-1_kJCuQnIyIInp32m5cn9k7kXoXaCgYKAToSARISFQHGX2MixgZGipRG9hGzdkpDaQzETQ0175";
 
   const auth = new google.auth.OAuth2();
   auth.setCredentials({ access_token });
@@ -45,6 +47,31 @@ async function addLabel(data: { messageId: string, labelId: string }) {
     return { error: 'Failed to add label to email' };
   }
 }
+
+async function listFolders(data: { pageSize: number }) {
+  const googleInstance = await getGoogleInstance();
+
+  if (!googleInstance) {
+    return { error: 'Unauthorized' };
+  }
+
+  const { drive } = googleInstance;
+
+  try {
+    const response = await drive.files.list({
+      pageSize: data.pageSize,
+      fields: 'files(id, name)',
+      q: "mimeType='application/vnd.google-apps.folder'",
+    });
+
+    console.log('Folders fetched successfully');
+    return { folders: response.data.files };
+  } catch (error) {
+    console.error('Error fetching folders:');
+    return { error: 'Failed to fetch folders' };
+  }
+}
+
 
 async function ListLabels() {
   const googleInstance = await getGoogleInstance();
@@ -410,4 +437,4 @@ async function updateFile(data: { fileId: string, body: string }) {
   }
 }
 
-export { createFile, deleteFile, getAllfiles, readFile, updateFile, addLabel, removeLabel, createLabel, deleteEmail, searchEmails, sendEmail, createAndSendDraftEmail, getGoogleInstance, ListLabels, ListEmails };
+export { createFile, deleteFile, getAllfiles, readFile, updateFile, addLabel, removeLabel, createLabel, deleteEmail, searchEmails, sendEmail, createAndSendDraftEmail, getGoogleInstance, ListLabels, ListEmails ,listFolders};

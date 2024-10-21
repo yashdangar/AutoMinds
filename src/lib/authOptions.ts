@@ -72,7 +72,7 @@ export const authOptions: AuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
       authorization: {
         params: {
-          scope: 'openid email profile https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/classroom.courses.readonly https://www.googleapis.com/auth/classroom.rosters https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/gmail.modify https://mail.google.com/ ',
+          scope: 'openid email profile https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/classroom.courses.readonly https://www.googleapis.com/auth/classroom.rosters https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/gmail.modify https://mail.google.com/',
           access_type: 'offline', 
         },
       },
@@ -89,7 +89,7 @@ export const authOptions: AuthOptions = {
         token.refreshToken = account.refresh_token;
         token.accessTokenExpires = account.expires_at * 1000;
         token.email = profile.email;
-        // console.log('Token 1 ', token);
+        console.log('Token 1 ', account);
 
         const user = await prisma.user.upsert({
           where: { email: profile.email },
