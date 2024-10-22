@@ -6,11 +6,13 @@ import { authOptions } from "@/lib/authOptions";
 async function getGoogleInstance() {
   const session = await getServerSession(authOptions);
 
-  if (!session || !session.user?.email || !session.accessToken) {
-    return null;
-  }
-  // console.log('Session : ', session);
-  const access_token = session.accessToken;
+  // if (!session || !session.user?.email || !session.accessToken) {
+  //   return null;
+  // }
+  // // console.log('Session : ', session);
+  // const access_token = session.accessToken;
+
+  const access_token = "";
 
   const auth = new google.auth.OAuth2();
   auth.setCredentials({ access_token });
@@ -19,6 +21,32 @@ async function getGoogleInstance() {
   const gmail = google.gmail({ version: "v1", auth });
 
   return { drive, gmail };
+}
+
+//Google watcher
+async function watchUser() {
+  const googleInstance = await getGoogleInstance();
+  if (!googleInstance) {
+    return { error: 'Unauthorized' };
+  }
+  
+  const { gmail } = googleInstance;
+  try {
+    const res = await gmail.users.watch({
+      userId: 'me',
+      requestBody: {
+        topicName: 'projects/zap-436910/topics/gmail-notifications',
+        labelIds: ['INBOX'],
+      },
+    });
+    
+    console.log('Response:', res);
+    console.log('Watcher created');
+    return { res };
+  } catch (error) {
+    console.error(error);
+    return { error: 'Failed to create watcher' };
+  }
 }
 
 // Google mail functions
@@ -435,4 +463,4 @@ async function updateFile(data: { fileId: string, body: string }) {
   }
 }
 
-export { createFile, deleteFile, getAllfiles, readFile, updateFile, addLabel, removeLabel, createLabel, deleteEmail, searchEmails, sendEmail, createAndSendDraftEmail, getGoogleInstance, ListLabels, ListEmails ,listFolders};
+export { createFile, deleteFile, getAllfiles, readFile, updateFile, addLabel, removeLabel, createLabel, deleteEmail, searchEmails, sendEmail, createAndSendDraftEmail, getGoogleInstance, ListLabels, ListEmails ,listFolders,watchUser};
