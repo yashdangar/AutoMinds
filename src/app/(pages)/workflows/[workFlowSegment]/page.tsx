@@ -1,5 +1,6 @@
 "use client";
 import GoogleDriveTrigger from '@/components/forms/drive/trigger';
+import GitHubAction from '@/components/forms/github/node';
 import GitHubTrigger from '@/components/forms/github/trigger';
 import { Button } from '@/components/ui/button';
 import { useParams, useRouter } from 'next/navigation';
@@ -17,7 +18,8 @@ function WorkFlowSegment() {
         <br />
         <Button variant="outline" className="bg-green-600" onClick={()=>router.push(path)}>Save and Continue</Button>
         {/* <GoogleDriveTrigger></GoogleDriveTrigger> */}
-        <GitHubTrigger></GitHubTrigger>
+        {/* <GitHubTrigger></GitHubTrigger> */}
+        <GitHubAction></GitHubAction>
     </div> 
   );
 }
