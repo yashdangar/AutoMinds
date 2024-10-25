@@ -10,7 +10,8 @@ import ReactFlow, {
   addEdge,
   Connection,
   useReactFlow,
-  Node,Edge
+  Node,
+  Edge
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { useParams } from 'next/navigation'
@@ -31,9 +32,12 @@ export default function EditorContent() {
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [searchTerm, setSearchTerm] = useState('')
   const { editorId } = useParams<{editorId : string}>()
+  const [isSaving, setIsSaving] = useState(false)
+  const [isFetching, setIsFetching] = useState(true)
 
   useEffect(() => {
     const fetchWorkflowData = async () => {
+      setIsFetching(true)
       try {
         const data = await getNodesAndEdges({ workflowId: editorId })
         if (typeof data === "string") {
@@ -66,13 +70,12 @@ export default function EditorContent() {
           description: "Failed to load workflow data. Please try again.",
           variant: "destructive",
         })
+      } finally {
+        setIsFetching(false)
       }
     }
 
     fetchWorkflowData()
-
-    console.log(nodes);
-    console.log(edges)
   }, [editorId, toast, setNodes, setEdges])
 
   const onConnect = useCallback((params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges])
@@ -124,6 +127,7 @@ export default function EditorContent() {
   )
 
   const handleSave = async () => {
+    setIsSaving(true)
     try {
       const workflowData = {
         workflowId: editorId,
@@ -162,6 +166,8 @@ export default function EditorContent() {
         description: "Failed to save workflow. Please try again.",
         variant: "destructive",
       })
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -190,6 +196,8 @@ export default function EditorContent() {
           hasTrigger={nodes.length!==0}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
+          isSaving={isSaving}
+          isFetching={isFetching}
         />
       </div>
     </div>

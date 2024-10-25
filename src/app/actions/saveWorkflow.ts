@@ -39,7 +39,7 @@ export async function saveWorkflow(data: { workflowId: string, nodes: Nodes, edg
     if (!workflow) return "Workflow not found";
 
     for (const dataNode of data.nodes) {
-        console.log(dataNode);
+        // console.log(dataNode);
         await prisma.node.upsert({
             where: { id: dataNode.id.includes("-") ? dataNode.id.split("-")[1] : dataNode.id },
             create: {
@@ -60,7 +60,7 @@ export async function saveWorkflow(data: { workflowId: string, nodes: Nodes, edg
     }
 
     for (const dataEdge of data.edges) {
-        console.log(dataEdge);
+        // console.log(dataEdge);
         await prisma.edge.upsert({
             where: { id: dataEdge.id },
             create: {

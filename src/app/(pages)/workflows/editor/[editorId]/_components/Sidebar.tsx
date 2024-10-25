@@ -3,16 +3,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
-import { Database, Github, Mailbox, Search } from 'lucide-react'
+import { Database, Github, Mailbox, Search, Loader2 } from 'lucide-react'
 
 type SidebarProps = {
   handleSave: () => void
   hasTrigger: boolean
   searchTerm: string
   setSearchTerm: (term: string) => void
+  isSaving: boolean
+  isFetching: boolean
 }
 
-export default function Sidebar({ handleSave, hasTrigger, searchTerm, setSearchTerm }: SidebarProps) {
+export default function Sidebar({ handleSave, hasTrigger, searchTerm, setSearchTerm, isSaving, isFetching }: SidebarProps) {
   const onDragStart = (event: DragEvent<HTMLButtonElement>, nodeType: string) => {
     event.dataTransfer.setData('application/reactflow', nodeType)
     event.dataTransfer.effectAllowed = 'move'
@@ -39,7 +41,16 @@ export default function Sidebar({ handleSave, hasTrigger, searchTerm, setSearchT
       <CardHeader>
         <CardTitle>
           <div className="border-t border-b py-4">
-            <Button onClick={handleSave}>Save Workflow</Button>
+            <Button onClick={handleSave} disabled={isSaving || isFetching}>
+              {isSaving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                'Save Workflow'
+              )}
+            </Button>
           </div>
         </CardTitle>
       </CardHeader>
@@ -53,6 +64,7 @@ export default function Sidebar({ handleSave, hasTrigger, searchTerm, setSearchT
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-8"
+              disabled={isFetching}
             />
           </div>
         </div>
@@ -65,6 +77,7 @@ export default function Sidebar({ handleSave, hasTrigger, searchTerm, setSearchT
                 className="w-full justify-start"
                 onDragStart={(event) => onDragStart(event, node.type)}
                 draggable
+                disabled={isFetching}
               >
                 <node.icon className="mr-2 h-4 w-4" /> {node.label}
               </Button>
