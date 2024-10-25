@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useCallback, DragEvent } from 'react'
+import React, { useState, useCallback, DragEvent ,useMemo, useEffect} from 'react'
 import ReactFlow, {
   Node,
   Edge,
@@ -15,42 +15,94 @@ import ReactFlow, {
   useReactFlow,
   Handle,
   Position,
+  useNodeId
 } from 'reactflow'
 import 'reactflow/dist/style.css'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useParams } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
-import { PlusCircle, Github, Database, Search } from 'lucide-react'
+import { PlusCircle, Github, Database, Search, Inbox } from 'lucide-react'
 import { useToast } from "@/hooks/use-toast"
+import { Badge } from "@/components/ui/badge"
+import clsx from 'clsx'
+import { saveWorkflow } from '@/app/actions/saveWorkflow'
 
-const TriggerNode = ({ data }: { data: { label: string; type: string } }) => {
+type CustomNodeData = {
+  label: string
+  type: string
+  description: string
+  status ?: string
+}
+
+function CustomWorkflowNode({ data }: { data: CustomNodeData }) {
+  const nodeId = useNodeId()
+  const logo = useMemo(() => {
+    if (data.label.toLowerCase().includes('googledrive')) return <Database />
+    if (data.label.toLowerCase().includes('github')) return <Github />
+    if (data.label.toLowerCase().includes('gmail')) return <Inbox />
+    return <PlusCircle />
+  }, [data.label])
+
+  const statusColor = useMemo(() => {
+    const random = Math.random()
+    if (random < 0.6) return 'bg-green-500'
+    if (random < 0.8) return 'bg-orange-500'
+    return 'bg-red-500'
+  }, [])
+
   return (
-    <Card className="min-w-[150px]">
-      <CardHeader className="p-3">
-        <CardTitle className="text-sm">{data.label}</CardTitle>
-      </CardHeader>
-      <CardContent className="p-3">
-        <p className="text-xs text-muted-foreground">{data.type}</p>
-      </CardContent>
-      <Handle type="source" position={Position.Bottom} />
-    </Card>
+    <>
+      {data.type !== 'Trigger' && (
+        <Handle
+          type="target"
+          position={Position.Top}
+          style={{ zIndex: 100 }}
+        />
+      )}
+      <Card className="relative max-w-[400px] dark:border-muted-foreground/70">
+        <CardHeader className="flex flex-row items-center gap-4">
+          <div>{logo}</div>
+          <div>
+            <CardTitle className="text-md">{data.label}</CardTitle>
+            <CardDescription>
+              <p className="text-xs text-muted-foreground/50">
+                <b className="text-muted-foreground/80">ID: </b>
+                {nodeId}
+              </p>
+              <p>{data.description}</p>
+            </CardDescription>
+          </div>
+        </CardHeader>
+        <Badge
+          variant="secondary"
+          className="absolute right-2 top-2"
+        >
+          {data.type}
+        </Badge>
+        <div
+          className={clsx('absolute left-3 top-4 h-2 w-2 rounded-full', statusColor)}
+        ></div>
+      </Card>
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        id="a"
+      />
+    </>
   )
 }
 
-const ActionNode = ({ data }: { data: { label: string; type: string } }) => {
+const TriggerNode = ({ data }: { data: CustomNodeData }) => {
   return (
-    <Card className="min-w-[150px]">
-      <Handle type="target" position={Position.Top} />
-      <CardHeader className="p-3">
-        <CardTitle className="text-sm">{data.label}</CardTitle>
-      </CardHeader>
-      <CardContent className="p-3">
-        <p className="text-xs text-muted-foreground">{data.type}</p>
-      </CardContent>
-      <Handle type="source" position={Position.Bottom} />
-    </Card>
+    <CustomWorkflowNode data={data}/>
+  )
+}
+
+const ActionNode = ({ data }: { data: CustomNodeData }) => {
+  return (
+    <CustomWorkflowNode data={data}/>
   )
 }
 
@@ -78,7 +130,7 @@ const Sidebar = ({ handleSave, hasTrigger, searchTerm, setSearchTerm }: {
   const actionNodes = [
     { type: 'googledrive', label: 'Google Drive Action', icon: Database },
     { type: 'github', label: 'GitHub Action', icon: Github },
-    { type: 'gmail', label: 'Gmail Action', icon: Database },
+    { type: 'gmail', label: 'Gmail Action', icon: Inbox },
   ]
 
   const nodesToShow = hasTrigger ? actionNodes : triggerNodes
@@ -136,6 +188,7 @@ const EditorContent = () => {
   const { editorId } = useParams<{editorId : string}>()
   const reactFlowInstance = useReactFlow()
 
+
   const onConnect = useCallback((params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges])
 
   const onDragOver = useCallback((event: DragEvent<HTMLDivElement>) => {
@@ -184,26 +237,25 @@ const EditorContent = () => {
 
   const handleSave = async () => {
     try {
-      const response = await fetch('/api/save-workflow', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          editorId,
-          nodes,
-          edges,
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to save workflow')
+      const response = await saveWorkflow({ workflowId: editorId, nodes, edges })
+      if(response === "Workflow saved successfully"){
+        toast({
+          title: "Success",
+          description: "Workflow saved successfully.",
+        })
+      }else if (response === "Unauthorized"){
+        toast({
+          title: "Unauthorized",
+          description: "Failed to save workflow. Please try again.",
+          variant: "destructive",
+        })
+      }else {
+        toast({
+          title: "Workflow not found",
+          description: "Failed to save workflow. Please try again.",
+          variant: "destructive",
+        })
       }
-
-      toast({
-        title: "Success",
-        description: "Workflow saved successfully.",
-      })
     } catch (error) {
       toast({
         title: "Error",

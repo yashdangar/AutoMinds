@@ -59,12 +59,10 @@ model Node {
   type          NodeType
   workflowId    String
   workflow      Workflow @relation("WorkflowNodes", fields: [workflowId], references: [id]) // Many-to-one relationship with Workflow
-
+  workerType    WorkerType
   // this will store position for react flow
   positionX     Float
   positionY     Float
-
-  @@unique([name, workflowId]) // this means that the name of the node should be unique in the workflow
 }
 
 model Edge  {
@@ -76,6 +74,10 @@ model Edge  {
   workflow   Workflow @relation("WorkflowEdges", fields: [workflowId], references: [id]) // Many-to-one relationship with Workflow
 }
 
+enum WorkerType {
+  Trigger
+  Action
+}
 enum NodeType {
   Google
   Github 

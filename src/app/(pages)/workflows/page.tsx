@@ -234,7 +234,7 @@ export default function Component() {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Loading...
+                    {editingWorkflow ? "Updating..." : "Creating..."}
                   </>
                 ) : (
                   editingWorkflow ? "Update Workflow" : "Create Workflow"

@@ -2,7 +2,6 @@
 import prisma from "@/lib/db";
 import { getServerSession } from "next-auth";
 
-// this is not working , we have to use transaction to delete all the related data
 export async function deleteWorkflow(id: string) : Promise<string> {
     const session = await getServerSession();
 
@@ -20,12 +19,25 @@ export async function deleteWorkflow(id: string) : Promise<string> {
         return "User not found"
     }
 
-    const workflow = await prisma.workflow.delete({
-        where: {
-            id: id
-        }
-    });
+    const transaction = await prisma.$transaction(async(tx)=>{
+        await tx.edge.deleteMany({
+            where :{
+                workflowId : id
+            }
+        })
+        await tx.node.deleteMany({
+            where :{
+                workflowId : id
+            }
+        })
+        await tx.workflow.delete({
+            where : {
+                id
+            }
+        })
+        return "Transaction complete";
+    })
 
-    console.log(workflow);
-    return workflow.id;
+    console.log(transaction);
+    return "success";
 }
