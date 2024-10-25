@@ -1,193 +1,79 @@
 "use client"
 
-import React, { useState, useCallback, DragEvent ,useMemo, useEffect} from 'react'
+import React, { useState, useCallback, DragEvent, useMemo, useEffect } from 'react'
 import ReactFlow, {
-  Node,
-  Edge,
   Controls,
   Background,
   useNodesState,
   useEdgesState,
   MiniMap,
-  ReactFlowProvider,
   addEdge,
   Connection,
   useReactFlow,
-  Handle,
-  Position,
-  useNodeId
+  Node,Edge
 } from 'reactflow'
 import 'reactflow/dist/style.css'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useParams } from 'next/navigation'
-import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Input } from "@/components/ui/input"
-import { PlusCircle, Github, Database, Search, Inbox } from 'lucide-react'
 import { useToast } from "@/hooks/use-toast"
-import { Badge } from "@/components/ui/badge"
-import clsx from 'clsx'
+import { getNodesAndEdges } from '@/app/actions/getNodeAndEdges'
 import { saveWorkflow } from '@/app/actions/saveWorkflow'
-
-type CustomNodeData = {
-  label: string
-  type: string
-  description: string
-  status ?: string
-}
-
-function CustomWorkflowNode({ data }: { data: CustomNodeData }) {
-  const nodeId = useNodeId()
-  const logo = useMemo(() => {
-    if (data.label.toLowerCase().includes('googledrive')) return <Database />
-    if (data.label.toLowerCase().includes('github')) return <Github />
-    if (data.label.toLowerCase().includes('gmail')) return <Inbox />
-    return <PlusCircle />
-  }, [data.label])
-
-  const statusColor = useMemo(() => {
-    const random = Math.random()
-    if (random < 0.6) return 'bg-green-500'
-    if (random < 0.8) return 'bg-orange-500'
-    return 'bg-red-500'
-  }, [])
-
-  return (
-    <>
-      {data.type !== 'Trigger' && (
-        <Handle
-          type="target"
-          position={Position.Top}
-          style={{ zIndex: 100 }}
-        />
-      )}
-      <Card className="relative max-w-[400px] dark:border-muted-foreground/70">
-        <CardHeader className="flex flex-row items-center gap-4">
-          <div>{logo}</div>
-          <div>
-            <CardTitle className="text-md">{data.label}</CardTitle>
-            <CardDescription>
-              <p className="text-xs text-muted-foreground/50">
-                <b className="text-muted-foreground/80">ID: </b>
-                {nodeId}
-              </p>
-              <p>{data.description}</p>
-            </CardDescription>
-          </div>
-        </CardHeader>
-        <Badge
-          variant="secondary"
-          className="absolute right-2 top-2"
-        >
-          {data.type}
-        </Badge>
-        <div
-          className={clsx('absolute left-3 top-4 h-2 w-2 rounded-full', statusColor)}
-        ></div>
-      </Card>
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        id="a"
-      />
-    </>
-  )
-}
-
-const TriggerNode = ({ data }: { data: CustomNodeData }) => {
-  return (
-    <CustomWorkflowNode data={data}/>
-  )
-}
-
-const ActionNode = ({ data }: { data: CustomNodeData }) => {
-  return (
-    <CustomWorkflowNode data={data}/>
-  )
-}
+import CustomWorkflowNode from './_components/CustoWorkflowNodes'
+import Sidebar from "./_components/Sidebar"
 
 const nodeTypes = {
-  trigger: TriggerNode,
-  action: ActionNode,
+  customNode: CustomWorkflowNode,
 }
 
-const Sidebar = ({ handleSave, hasTrigger, searchTerm, setSearchTerm }: { 
-  handleSave: () => void, 
-  hasTrigger: boolean, 
-  searchTerm: string, 
-  setSearchTerm: (term: string) => void 
-}) => {
-  const onDragStart = (event: DragEvent<HTMLButtonElement>, nodeType: string) => {
-    event.dataTransfer.setData('application/reactflow', nodeType)
-    event.dataTransfer.effectAllowed = 'move'
-  }
-
-  const triggerNodes = [
-    { type: 'googledrive', label: 'Google Drive Trigger', icon: Database },
-    { type: 'github', label: 'GitHub Trigger', icon: Github },
-  ]
-
-  const actionNodes = [
-    { type: 'googledrive', label: 'Google Drive Action', icon: Database },
-    { type: 'github', label: 'GitHub Action', icon: Github },
-    { type: 'gmail', label: 'Gmail Action', icon: Inbox },
-  ]
-
-  const nodesToShow = hasTrigger ? actionNodes : triggerNodes
-  const filteredNodes = nodesToShow.filter(node => 
-    node.label.toLowerCase().includes(searchTerm.toLowerCase())
-  )
-
-  return (
-    <Card className="w-64 h-auto border-l">
-      <CardHeader>
-        <CardTitle>
-          <div className="border-t border-b py-4">
-            <Button onClick={handleSave}>Save Workflow</Button>
-          </div>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
-        <div className="p-4">
-          <div className="relative">
-            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <Input
-              type="text"
-              placeholder="Search nodes..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8"
-            />
-          </div>
-        </div>
-        <ScrollArea className="h-[calc(100vh-250px)]">
-          <div className="p-4 space-y-4">
-            {filteredNodes.map((node) => (
-              <Button
-                key={node.type}
-                variant="outline"
-                className="w-full justify-start"
-                onDragStart={(event) => onDragStart(event, node.type)}
-                draggable
-              >
-                <node.icon className="mr-2 h-4 w-4" /> {node.label}
-              </Button>
-            ))}
-          </div>
-        </ScrollArea>
-      </CardContent>
-    </Card>
-  )
-}
-
-const EditorContent = () => {
-  const {toast} = useToast()
+export default function EditorContent() {
+  const { toast } = useToast()
+  const reactFlowInstance = useReactFlow()
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [searchTerm, setSearchTerm] = useState('')
   const { editorId } = useParams<{editorId : string}>()
-  const reactFlowInstance = useReactFlow()
 
+  useEffect(() => {
+    const fetchWorkflowData = async () => {
+      try {
+        const data = await getNodesAndEdges({ workflowId: editorId })
+        if (typeof data === "string") {
+          toast({
+            title: "Error",
+            description: data,
+            variant: "destructive",
+          })
+        } else {
+          setNodes(data.nodes.map((node:any) => ({
+            id: node.id,
+            type: 'customNode',
+            position: { x: node.positionX, y: node.positionY },
+            data: {
+              label: node.name,
+              type: node.workerType,
+              description: node.description,
+              nodeType: node.type,
+            },
+          })))
+          setEdges(data.edges.map((edge:any) => ({
+            id: edge.id,
+            source: edge.sourceId,
+            target: edge.targetId,
+          })))
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to load workflow data. Please try again.",
+          variant: "destructive",
+        })
+      }
+    }
+
+    fetchWorkflowData()
+
+    console.log(nodes);
+    console.log(edges)
+  }, [editorId, toast, setNodes, setEdges])
 
   const onConnect = useCallback((params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges])
 
@@ -211,7 +97,7 @@ const EditorContent = () => {
         y: event.clientY,
       })
 
-      if (nodes.length === 0 && (type !== 'googledrive' && type !== 'github')) {
+      if (nodes.length === 0 && type !== 'Google' && type !== 'Github') {
         toast({
           title: "Error",
           description: "The first node must be a trigger node.",
@@ -220,13 +106,15 @@ const EditorContent = () => {
         return
       }
 
-      const newNode: Node = {
+      const newNode = {
         id: `${type}-${Date.now()}`,
-        type: nodes.length === 0 ? 'trigger' : 'action',
+        type: 'customNode',
         position,
         data: { 
-          label: `${type.charAt(0).toUpperCase() + type.slice(1)} ${nodes.length === 0 ? 'Trigger' : 'Action'}`,
-          type: nodes.length === 0 ? 'Trigger' : 'Action'
+          label: `${type} ${nodes.length === 0 ? 'Trigger' : 'Action'}`,
+          type: nodes.length === 0 ? 'Trigger' : 'Action',
+          description: `This is a ${nodes.length === 0 ? 'trigger' : 'action'} node for ${type}.`,
+          nodeType: type === 'Google' ? 'Google' : 'Github',
         },
       }
 
@@ -237,22 +125,34 @@ const EditorContent = () => {
 
   const handleSave = async () => {
     try {
-      const response = await saveWorkflow({ workflowId: editorId, nodes, edges })
+      const workflowData = {
+        workflowId: editorId,
+        nodes: nodes.map(node => ({
+          id: node.id,
+          name: node.data.label,
+          description: node.data.description,
+          type: node.data.nodeType,
+          workerType: node.data.type,
+          positionX: node.position.x,
+          positionY: node.position.y,
+        })),
+        edges: edges.map(edge => ({
+          id: edge.id,
+          sourceId: edge.source,
+          targetId: edge.target,
+        })),
+      }
+
+      const response = await saveWorkflow({workflowId : workflowData.workflowId , nodes : workflowData.nodes, edges : workflowData.edges})
       if(response === "Workflow saved successfully"){
         toast({
           title: "Success",
           description: "Workflow saved successfully.",
         })
-      }else if (response === "Unauthorized"){
+      } else {
         toast({
-          title: "Unauthorized",
-          description: "Failed to save workflow. Please try again.",
-          variant: "destructive",
-        })
-      }else {
-        toast({
-          title: "Workflow not found",
-          description: "Failed to save workflow. Please try again.",
+          title: "Error",
+          description: response,
           variant: "destructive",
         })
       }
@@ -287,19 +187,11 @@ const EditorContent = () => {
         </div>
         <Sidebar 
           handleSave={handleSave} 
-          hasTrigger={nodes.some(node => node.type === 'trigger')}
+          hasTrigger={nodes.length!==0}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
         />
       </div>
     </div>
-  )
-}
-
-export default function EditorId() {
-  return (
-    <ReactFlowProvider>
-      <EditorContent />
-    </ReactFlowProvider>
   )
 }

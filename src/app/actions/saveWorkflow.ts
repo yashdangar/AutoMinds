@@ -1,9 +1,24 @@
 "use server"
 import prisma from "@/lib/db";
-import { Node, NodeType, WorkerType } from "@prisma/client";
+import { Edge, Node, NodeType, WorkerType } from "@prisma/client";
 import { getServerSession } from "next-auth";
 
-export async function saveWorkflow(data: { workflowId: string, nodes: any, edges: any }) {
+type Nodes = {
+    id: string,
+    name:string ,
+    description: string,
+    type:string ,
+    workerType:string ,
+    positionX: number,
+    positionY:number,
+}[]
+type Edges = {
+    id: string,
+    sourceId: string,
+    targetId: string,
+}[]
+
+export async function saveWorkflow(data: { workflowId: string, nodes: Nodes, edges: Edges }) {
     const session = await getServerSession();
 
     if (!session || !session.user?.email) {
@@ -24,37 +39,39 @@ export async function saveWorkflow(data: { workflowId: string, nodes: any, edges
     if (!workflow) return "Workflow not found";
 
     for (const dataNode of data.nodes) {
+        console.log(dataNode);
         await prisma.node.upsert({
-            where: { id: dataNode.id.split("-")[1] },
+            where: { id: dataNode.id.includes("-") ? dataNode.id.split("-")[1] : dataNode.id },
             create: {
-                id: dataNode.id.split("-")[1],
-                name: "",
-                description: "",
+                id: dataNode.id.includes("-") ? dataNode.id.split("-")[1] : dataNode.id,
+                name: dataNode.name,
+                description: dataNode.description,
                 type: dataNode.id.includes("drive") || dataNode.id.includes("gmail") ? NodeType.Google : NodeType.Github,
                 workflowId: data.workflowId,
-                positionX: dataNode.position.x,
-                positionY: dataNode.position.y,
-                workerType: dataNode.type === "trigger" ? WorkerType.Trigger : WorkerType.Action
+                positionX: dataNode.positionX,
+                positionY: dataNode.positionY,
+                workerType: dataNode.workerType === "trigger" ? WorkerType.Trigger : WorkerType.Action
             },
             update: {
-                positionX: dataNode.position.x,
-                positionY: dataNode.position.y,
+                positionX: dataNode.positionX,
+                positionY: dataNode.positionY,
             }
         });
     }
 
     for (const dataEdge of data.edges) {
+        console.log(dataEdge);
         await prisma.edge.upsert({
             where: { id: dataEdge.id },
             create: {
                 id: dataEdge.id,
-                sourceId: dataEdge.source.split("-")[1],
-                targetId: dataEdge.target.split("-")[1],
+                sourceId: dataEdge.sourceId.includes("-") ?  dataEdge.sourceId.split("-")[1] : dataEdge.sourceId,
+                targetId: dataEdge.targetId.includes("-") ?  dataEdge.targetId.split("-")[1] : dataEdge.targetId,
                 workflowId: data.workflowId,
             },
             update: {
-                sourceId: dataEdge.source.split("-")[1],
-                targetId: dataEdge.target.split("-")[1],
+                sourceId: dataEdge.sourceId.includes("-") ?  dataEdge.sourceId.split("-")[1] : dataEdge.sourceId,
+                targetId: dataEdge.targetId.includes("-") ?  dataEdge.targetId.split("-")[1] : dataEdge.targetId,
             }
         });
     }
