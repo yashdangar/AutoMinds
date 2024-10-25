@@ -38,6 +38,7 @@ async function main() {
       workflowId: workflow.id,
       positionX: 10,
       positionY: 20,
+      workerType: "Trigger",
     },
   });
 
@@ -49,6 +50,7 @@ async function main() {
       workflowId: workflow.id,
       positionX: 30,
       positionY: 40,
+      workerType: "Action",
     },
   });
 
