@@ -1,106 +1,93 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import { signOut, useSession } from "next-auth/react";
+'use client'
+
+import React, { useEffect, useState } from "react"
+import { usePathname, useRouter } from "next/navigation"
+import { signOut, useSession } from "next-auth/react"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import Image from "next/image";
-import getImageURL from "@/app/actions/getImage";
+} from "@/components/ui/tooltip"
+import Image from "next/image"
+import getImageURL from "@/app/actions/getImage"
 
-const InfoBar = () => {
-  const [imageUrl, setImageUrl] = useState("");
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const path = pathname.split("/").pop();
+const Header = () => {
+  const [imageUrl, setImageUrl] = useState("")
+  const router = useRouter()
+  const pathname = usePathname()
+  const { data: session, status } = useSession()
+  const path = pathname.split("/").pop()
   let formattedPath = path
     ? path.charAt(0).toUpperCase() + path.slice(1).toLowerCase()
-    : "";
+    : ""
 
-  if (pathname.includes("editor")) formattedPath = "Editor";
+  if (pathname.includes("editor")) formattedPath = "Editor"
 
-  useEffect(()=>{
+  useEffect(() => {
     const getImage = async () => {
-      const imageUrl2 = await getImageURL();
-      // console.log("imageUrl2" + imageUrl2);
-      if(imageUrl2){
-        setImageUrl(imageUrl2);
+      const imageUrl2 = await getImageURL()
+      if (imageUrl2) {
+        setImageUrl(imageUrl2)
       }
     }
-    getImage();
-  },[imageUrl,setImageUrl])
+    getImage()
+  }, [])
+
   return (
     <TooltipProvider>
-      <Tooltip>
-        <div className="flex flex-col gap-4 relative">
-          <div className="flex justify-between text-3xl sticky top-0 z-[10] py-2 px-8 bg-background/50 backdrop-blur-lg items-center border-b rounded-3xl">
-            <h1 onClick={() => router.push("/")} className={`cursor-pointer`}>
-              Autominds
-            </h1>
-            <div className="flex gap-10">
-              <div className="flex gap-10 mt-2 text-2xl">
-                <h3
-                  onClick={() => router.push("/dashboard")}
-                  className={`cursor-pointer ${
-                    formattedPath.toLowerCase() === "dashboard"
-                      ? "text-white"
-                      : "text-[#abaaaa]"
+      <header className="sticky top-0 z-10 w-full bg-background/50 backdrop-blur-lg border-b">
+        <div className="container mx-auto px-4 py-2 flex items-center justify-between">
+          <h1 
+            onClick={() => router.push("/")} 
+            className="text-2xl font-bold cursor-pointer text-primary"
+          >
+            Autominds
+          </h1>
+          <div className="bg-muted px-4 py-2 rounded-full">
+            <nav className="flex space-x-6">
+              {["Dashboard", "Connections", "Workflows"].map((item) => (
+                <button
+                  key={item}
+                  onClick={() => router.push(`/${item.toLowerCase()}`)}
+                  className={`text-sm font-medium transition-colors hover:text-primary ${
+                    formattedPath.toLowerCase() === item.toLowerCase()
+                      ? "text-primary"
+                      : "text-muted-foreground"
                   }`}
                 >
-                  Dashboard
-                </h3>
-                <h3
-                  onClick={() => router.push("/connections")}
-                  className={`cursor-pointer ${
-                    formattedPath.toLowerCase() === "connections"
-                      ? "text-white"
-                      : "text-[#abaaaa]"
-                  }`}
-                >
-                  Connections
-                </h3>
-                <h3
-                  onClick={() => router.push("/workflows")}
-                  className={`cursor-pointer ${
-                    formattedPath.toLowerCase() === "workflows"
-                      ? "text-white"
-                      : "text-[#abaaaa]"
-                  }`}
-                >
-                  Worflows
-                </h3>
-              </div>
+                  {item}
+                </button>
+              ))}
+            </nav>
+          </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
               <div
-                className="pr-4 cursor-pointer"
+                className="cursor-pointer"
                 onDoubleClick={() => signOut()}
               >
-                <TooltipTrigger>
-                  <Image
-                    src={
-                      status === "authenticated"
-                        ? imageUrl || "/deafult-person.png"
-                        : "/deafult-person.png"
-                    }
-                    width={500}
-                    height={500}
-                    alt="Profile"
-                    className="rounded-[40px] h-[40px] w-[40px]"
-                  />
-                </TooltipTrigger>
-                <TooltipContent className="bg-black/10 backdrop-blur-xl text-white text-[14px]">
-                  <p>Double click to Logout </p>
-                </TooltipContent>
+                <Image
+                  src={
+                    status === "authenticated"
+                      ? imageUrl || "/deafult-person.png"
+                      : "/deafult-person.png"
+                  }
+                  width={40}
+                  height={40}
+                  alt="Profile"
+                  className="rounded-full"
+                />
               </div>
-            </div>
-          </div>
+            </TooltipTrigger>
+            <TooltipContent className="bg-primary text-primary-foreground text-sm">
+              <p>Double click to Logout</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
-      </Tooltip>
+      </header>
     </TooltipProvider>
-  );
-};
+  )
+}
 
-export default InfoBar;
+export default Header

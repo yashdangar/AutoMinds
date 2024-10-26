@@ -1,67 +1,74 @@
-"use client"
-import { signIn } from 'next-auth/react';
-import { Button } from "@/components/ui/button"
+'use client'
 
-function Signin() {
+import { Button } from "@/components/ui/button"
+import { ChromeIcon } from "lucide-react"
+import { signIn } from "next-auth/react"
+
+export default function Signin() {
   return (
-    <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-md space-y-6 text-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Sign Up OR Sign In</h1>
-          <p className="mt-2 text-muted-foreground">Create an account or Login to get started with AutoMinds</p>
-        </div>
-        <div className="grid gap-2">
-          <Button variant="outline" className="flex items-center justify-center gap-2" onClick={()=>signIn("google")}>
-            <ChromeIcon className="h-5 w-5" />
-            Sign up with Google
-          </Button>
+    <div className="flex min-h-[100dvh] bg-gradient-to-b from-black from-12% via-purple-950 via-70% to-purple-800 to-90%">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-md space-y-6 text-center">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Sign Up or Sign In</h1>
+            <p className="mt-2 text-purple-300">Create an account or Login to get started with AutoMinds</p>
+          </div>
+          <div className="grid gap-2">
+            <Button variant="outline" className="flex items-center justify-center gap-2 bg-purple-900 text-white border-purple-700 hover:bg-purple-800 hover:text-purple-100" onClick={()=>signIn("google")}>
+              <ChromeIcon className="h-5 w-5" />
+              Sign up with Google
+            </Button>
+          </div>
         </div>
       </div>
+      <div className="flex-1 relative overflow-hidden bg-transparent">
+        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="aurora-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#4B0082" />
+              <stop offset="50%" stopColor="#8A2BE2" />
+              <stop offset="100%" stopColor="#9400D3" />
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+              <feMerge>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          <path
+            d="M50 0 Q50 50 50 100"
+            stroke="url(#aurora-gradient)"
+            strokeWidth="2"
+            fill="none"
+            style={{
+              animation: 'aurora-wave 10s ease-in-out infinite',
+            }}
+          />
+          {[...Array(20)].map((_, i) => (
+            <path
+              key={i}
+              d={`M50 0 Q${50 + (i - 10) * 3} 50 50 100`}
+              stroke="url(#aurora-gradient)"
+              strokeWidth="1.5"
+              fill="none"
+              opacity="0.5"
+              filter="url(#glow)"
+              style={{
+                animation: 'aurora-wave 8s ease-in-out infinite',
+                animationDelay: `${i * 0.2}s`,
+              }}
+            />
+          ))}
+        </svg>
+      </div>
+      <style jsx>{`
+        @keyframes aurora-wave {
+          0%, 100% { transform: scaleX(1) translateX(0); }
+          50% { transform: scaleX(1.5) translateX(10px); }
+        }
+      `}</style>
     </div>
   )
 }
-
-function ChromeIcon(props:any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <circle cx="12" cy="12" r="4" />
-      <line x1="21.17" x2="12" y1="8" y2="8" />
-      <line x1="3.95" x2="8.54" y1="6.06" y2="14" />
-      <line x1="10.88" x2="15.46" y1="21.94" y2="14" />
-    </svg>
-  )
-}
-
-
-function GitlabIcon(props:any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m22 13.29-3.33-10a.42.42 0 0 0-.14-.18.38.38 0 0 0-.22-.11.39.39 0 0 0-.23.07.42.42 0 0 0-.14.18l-2.26 6.67H8.32L6.1 3.26a.42.42 0 0 0-.1-.18.38.38 0 0 0-.26-.08.39.39 0 0 0-.23.07.42.42 0 0 0-.14.18L2 13.29a.74.74 0 0 0 .27.83L12 21l9.69-6.88a.71.71 0 0 0 .31-.83Z" />
-    </svg>
-  )
-}
-
-export default Signin;

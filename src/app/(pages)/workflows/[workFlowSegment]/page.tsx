@@ -77,8 +77,8 @@ function WorkFlowSegment() {
   if (isFetching) return <div>Loading...</div>
 
   return (
-    <div className="space-y-6 flex flex-col min-h-screen p-6">
-      <div className="flex justify-end">
+    <div className="flex flex-col min-h-screen p-6">
+      <div className="flex justify-end mb-6">
         <motion.div
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -86,19 +86,19 @@ function WorkFlowSegment() {
           <Button 
             variant="outline" 
             onClick={() => router.push(editorPath)}
-            className="px-6 py-3 text-lg font-semibold "
+            className="px-6 py-3 text-lg font-semibold"
           >
             Editor
           </Button>
         </motion.div>
       </div>
 
-      <div className="flex-grow">
+      <div className="flex-grow mb-6">
         {renderStep(currentStep)}
       </div>
 
-      <div className="flex flex-col items-center space-y-2">
-        <div className="flex justify-center space-x-2">
+      <div className="flex flex-col items-center space-y-4">
+        <div className="flex justify-center space-x-2 mb-4">
           {nodes && nodes.map((_, index) => (
             <motion.div
               key={index}
@@ -127,7 +127,7 @@ function WorkFlowSegment() {
           {currentStep === nodes?.length ? (
             <Dialog open={isPublishModalOpen} onOpenChange={setIsPublishModalOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" className="bg-green-600">
+                <Button variant="outline" className="bg-green-600 text-white hover:bg-green-700">
                   Publish
                 </Button>
               </DialogTrigger>

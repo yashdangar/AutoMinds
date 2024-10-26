@@ -41,7 +41,7 @@ export default function GitHubAction() {
   const mockRepositories = ["user/repo1", "user/repo2", "organization/repo3"]
 
   return (
-    <div className="min-h-screen bg-background p-6 md:p-12">
+    <div className="bg-background p-6 md:p-12">
       <div className="max-w-4xl mx-auto space-y-8">
         <h1 className="text-3xl font-bold text-primary">GitHub Action</h1>
         
@@ -160,7 +160,7 @@ export default function GitHubAction() {
           )}
         </div>
 
-        <div className="pt-6">
+        <div className="mt-4">
           <Button 
             variant="default" 
             className="w-full md:w-auto px-8 py-2 text-lg"

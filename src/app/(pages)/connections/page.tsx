@@ -7,9 +7,12 @@ import getConnections from "@/app/actions/getConnections";
 
 function Connections() {
   const [connections, setConnections] = useState<string[]>([]);
+  const [isFetching, setIsFetching] = useState(false);
 
   const fetchConnections = useCallback(async () => {
+    setIsFetching(true);
     const connections = await getConnections();
+    setIsFetching(false);
     if (connections) {
       setConnections(connections);
     }
@@ -35,6 +38,7 @@ function Connections() {
               title={connection.title}
               description={connection.description}
               callback={fetchConnections}
+              isFetching={isFetching}
             />
           </div>
         );

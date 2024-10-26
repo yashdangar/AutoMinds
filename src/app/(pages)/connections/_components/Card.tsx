@@ -18,6 +18,7 @@ type Props = {
   description: string;
   callback: () => void;
   connected: string[];
+  isFetching: boolean;
 };
 
 const ConnectionCard = ({
@@ -27,6 +28,7 @@ const ConnectionCard = ({
   title,
   connected,
   callback,
+  isFetching,
 }: Props) => {
 
   const handleClick = (type: ConnectionTypes) => {
@@ -77,9 +79,9 @@ const ConnectionCard = ({
             onClick={() => {
               handleClick(type);
             }}
-            className="rounded-lg bg-primary p-2 font-bold text-primary-foreground cursor-pointer"
+            className={`rounded-lg bg-primary p-2 font-bold text-primary-foreground cursor-pointer ${isFetching ? "opacity-50" : ""}`}
           >
-            Connect
+            {isFetching ? "Loading..." : "Connect"}
           </div>
         )}
       </div>
