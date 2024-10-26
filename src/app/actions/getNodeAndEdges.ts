@@ -1,5 +1,6 @@
 "use server"
 import prisma from "@/lib/db";
+import { Edge, Node } from "@prisma/client";
 import { getServerSession } from "next-auth";
 
 export async function getNodesAndEdges(data : {workflowId : string}) : Promise<any>{

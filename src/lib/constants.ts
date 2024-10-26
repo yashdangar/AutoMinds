@@ -1,3 +1,4 @@
+import { Database, Github, Mailbox } from "lucide-react";
 import { Connection } from "./types";
 
 export const CONNECTIONS: Connection[] = [
@@ -35,3 +36,21 @@ export const MimeType = {
   EXCEL: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   POWERPOINT: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
 };
+
+  // Here every node which have google as dependency is should be of type "Google"
+type TriggerOrActionNodeReactType = {
+  type: 'Google' | 'Github'
+  label: string
+  icon: any
+}[]
+
+export const TriggerNodes : TriggerOrActionNodeReactType= [
+  { type: 'Google', label: 'Google Drive Trigger', icon: Database },
+  { type: 'Github', label: 'GitHub Trigger', icon: Github },
+]
+  // Here every node which have google as dependency is should be of type "Google"
+export  const ActionNodes : TriggerOrActionNodeReactType= [
+  { type: 'Google', label: 'Google Drive Action', icon: Database },
+  { type: 'Github', label: 'GitHub Action', icon: Github },
+  { type: 'Google' , label: 'Gmail Action', icon: Mailbox  },
+]

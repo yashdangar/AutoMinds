@@ -46,11 +46,11 @@ export async function saveWorkflow(data: { workflowId: string, nodes: Nodes, edg
                 id: dataNode.id.includes("-") ? dataNode.id.split("-")[1] : dataNode.id,
                 name: dataNode.name,
                 description: dataNode.description,
-                type: dataNode.id.includes("drive") || dataNode.id.includes("gmail") ? NodeType.Google : NodeType.Github,
+                type: dataNode.id.includes("Google") ? NodeType.Google : NodeType.Github,
                 workflowId: data.workflowId,
                 positionX: dataNode.positionX,
                 positionY: dataNode.positionY,
-                workerType: dataNode.workerType === "trigger" ? WorkerType.Trigger : WorkerType.Action
+                workerType: dataNode.workerType.toLowerCase() === "trigger" ? WorkerType.Trigger : WorkerType.Action
             },
             update: {
                 positionX: dataNode.positionX,

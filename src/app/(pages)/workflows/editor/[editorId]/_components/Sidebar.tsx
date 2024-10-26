@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { Database, Github, Mailbox, Search, Loader2 } from 'lucide-react'
+import { TriggerNodes , ActionNodes } from '@/lib/constants'
 
 type SidebarProps = {
   handleSave: () => void
@@ -20,17 +21,9 @@ export default function Sidebar({ handleSave, hasTrigger, searchTerm, setSearchT
     event.dataTransfer.effectAllowed = 'move'
   }
 
-  const triggerNodes = [
-    { type: 'Google', label: 'Google Drive Trigger', icon: Database },
-    { type: 'Github', label: 'GitHub Trigger', icon: Github },
-  ]
 
-  const actionNodes = [
-    { type: 'Google', label: 'Google Drive Action', icon: Database },
-    { type: 'Github', label: 'GitHub Action', icon: Github },
-    { type: 'Gmail' , label: 'Gmail Action', icon: Mailbox  },
-  ]
-
+  const triggerNodes = TriggerNodes
+  const actionNodes = ActionNodes
   const nodesToShow = hasTrigger ? actionNodes : triggerNodes
   const filteredNodes = nodesToShow.filter(node => 
     node.label.toLowerCase().includes(searchTerm.toLowerCase())

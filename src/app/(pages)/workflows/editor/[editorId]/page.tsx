@@ -117,7 +117,7 @@ export default function EditorContent() {
           label: `${type} ${nodes.length === 0 ? 'Trigger' : 'Action'}`,
           type: nodes.length === 0 ? 'Trigger' : 'Action',
           description: `This is a ${nodes.length === 0 ? 'trigger' : 'action'} node for ${type}.`,
-          nodeType: type === 'Google' ? 'Google' : 'Github',
+          nodeType: type,
         },
       }
 
@@ -127,6 +127,7 @@ export default function EditorContent() {
   )
 
   const handleSave = async () => {
+    console.log(nodes)
     setIsSaving(true)
     try {
       const workflowData = {
